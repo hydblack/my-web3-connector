@@ -1,10 +1,10 @@
 {
   "name": "my-web3-connector",
-  "version": "1.0.0",
+  "version": "1.0.2",
   "description": "A reusable React component for connecting to Web3 wallets.",
   "main": "dist/index.cjs.js",
   "module": "dist/index.esm.js",
-  "types": "dist/index.d.ts",
+  "types": "dist/types/index.d.ts",
   "files": [
     "dist"
   ],
