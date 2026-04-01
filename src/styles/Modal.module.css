@@ -1,0 +1,245 @@
+/* =========================================
+   全局变量 (建议放在 index.css 或 :root)
+   这里为了演示方便重复定义，实际使用请删除重复部分
+   ========================================= */
+:root {
+  --rk-color-overlay: rgba(12, 12, 12, 0.75);
+  --rk-color-card: #1c1c1c;
+  --rk-text-primary: #ffffff;
+  --rk-text-secondary: #9ca3af;
+  --rk-radius-modal: 24px;
+  --rk-radius-btn: 12px;
+  --rk-border-color: rgba(255, 255, 255, 0.1);
+  --rk-shadow-lg: 0 20px 40px rgba(0, 0, 0, 0.4);
+  --rk-transition: all 0.2s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* --- 遮罩层 (Overlay) --- */
+.modalOverlay {
+  position: fixed;
+  inset: 0;
+  background-color: var(--rk-color-overlay);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  backdrop-filter: blur(12px); /* 毛玻璃效果 */
+  opacity: 0;
+  animation: fadeIn 0.2s ease-out forwards;
+}
+
+/* --- 弹窗内容 (Content) --- */
+.modalContent {
+  background-color: var(--rk-color-card);
+  border-radius: var(--rk-radius-modal);
+  padding: 24px;
+  width: 90%;
+  max-width: 380px;
+  box-shadow: var(--rk-shadow-lg);
+  border: 1px solid var(--rk-border-color);
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  color: var(--rk-text-primary);
+  transform: scale(0.95) translateY(20px);
+  opacity: 0;
+  animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  position: relative;
+  overflow: hidden; /* 防止内容溢出 */
+}
+
+/* --- 头部布局 --- */
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+/* 关闭图标 */
+.closeIcon {
+  background: rgba(255, 255, 255, 0.05);
+  border: none;
+  color: var(--rk-text-secondary);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: var(--rk-transition);
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.closeIcon:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--rk-text-primary);
+  transform: rotate(90deg);
+}
+
+/* --- 钱包列表容器 --- */
+.walletList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+/* --- 钱包按钮 (核心样式) --- */
+.walletButton {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  padding: 14px 16px;
+  background-color: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--rk-border-color);
+  border-radius: var(--rk-radius-btn);
+  cursor: pointer;
+  transition: var(--rk-transition);
+  color: var(--rk-text-primary);
+  font-size: 1rem;
+  font-weight: 500;
+  outline: none;
+  position: relative;
+  overflow: hidden;
+}
+
+/* 按钮悬停效果 */
+.walletButton:hover {
+  background-color: rgba(255, 255, 255, 0.08);
+  border-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.walletButton:active {
+  transform: scale(0.98);
+}
+
+/* 图标容器 */
+.iconWrapper {
+  width: 36px;
+  height: 36px;
+  margin-right: 14px;
+  border-radius: 12px; /* 圆角图标风格 */
+  background: #fff; /* 白色背景防止透明图标看不清 */
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.walletIcon {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  border-radius: 8px;
+}
+
+.walletName {
+  flex: 1;
+  text-align: left;
+}
+
+/* 右侧箭头装饰 */
+.arrow {
+  opacity: 0;
+  transform: translateX(-10px);
+  transition: var(--rk-transition);
+  color: var(--rk-text-secondary);
+  font-size: 1.2rem;
+}
+
+.walletButton:hover .arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+/* --- 关闭/取消按钮 (底部) --- */
+.disconnectButton,.closeButton {
+  width: 100%;
+  padding: 12px;
+  background: transparent;
+  border: 1px solid var(--rk-border-color);
+  color: var(--rk-text-secondary);
+  border-radius: var(--rk-radius-btn);
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: var(--rk-transition);
+}
+
+.disconnectButton .btnIcon {
+  margin-right: 8px;
+}
+.disconnectButton:hover, .closeButton:hover {
+  color: var(--rk-text-primary);
+  border-color: var(--rk-text-secondary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* --- 动画 --- */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: scale(0.95) translateY(20px); opacity: 0; }
+  to { transform: scale(1) translateY(0); opacity: 1; }
+}
+
+/* --- 响应式 --- */
+@media (max-width: 480px) {
+  .modalContent {
+    padding: 20px;
+    max-width: 100%;
+    border-radius: 20px;
+  }
+  
+  .walletButton {
+    padding: 12px 14px;
+  }
+}
+
+/* --- 复制地址按钮 --- */
+.copyButton {
+  background-color: rgba(255, 255, 255, 0.08); /* 半透明背景 */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  color: var(--rk-text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-left: 8px;
+}
+
+/* 按钮自身的悬停效果 */
+.copyButton:hover {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--rk-text-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* 复制成功时的样式 */
+.copyButton.copied {
+  color: #10b981; /* 绿色 */
+  border-color: rgba(16, 185, 129, 0.3);
+  background-color: rgba(16, 185, 129, 0.1);
+}
+
+.actionGroup {
+  margin-top: 16px;
+}
