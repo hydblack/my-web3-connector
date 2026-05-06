@@ -1,4 +1,5 @@
 import React from 'react';
+import { createPortal } from 'react-dom';
 import styles from '../styles/Modal.module.css';
 import { useWeb3 } from '../context/Web3Context';
 import type { WalletType } from '../context/Web3Context';
@@ -28,7 +29,7 @@ const WalletModal: React.FC<Props> = ({ wallets, onClose }) => {
     onClose();
   };
 
-  return (
+  return createPortal(
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
@@ -62,7 +63,8 @@ const WalletModal: React.FC<Props> = ({ wallets, onClose }) => {
           Cancel
         </button>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

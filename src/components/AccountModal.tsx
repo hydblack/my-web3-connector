@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { AccountInfo } from '../core/BaseWallet';
 import styles from '../styles/Modal.module.css';
 
@@ -23,7 +24,7 @@ const AccountModal: React.FC<Props> = ({ onClose, onDisconnect, account }) => {
     }
   };
 
-  return (
+  return createPortal(
     <div className={styles.modalOverlay} onClick={onClose}>
       <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
         <div className={styles.modalHeader}>
@@ -59,7 +60,8 @@ const AccountModal: React.FC<Props> = ({ onClose, onDisconnect, account }) => {
           </button>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 

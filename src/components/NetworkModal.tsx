@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { createPortal } from 'react-dom';
 import styles from '../styles/NetworkModal.module.css';
 import { useWeb3 } from '../context/Web3Context';
 
@@ -56,7 +57,7 @@ const NetworkModal: React.FC<NetworkModalProps> = ({ onClose }) => {
     }
   };
 
-  return (
+  return createPortal(
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
         <div className={styles.header}>
@@ -82,7 +83,8 @@ const NetworkModal: React.FC<NetworkModalProps> = ({ onClose }) => {
         
         {error && <div className={styles.errorMsg}>{error}</div>}
       </div>
-    </div>
+    </div>,
+    document.body
   );
 };
 
