@@ -4,6 +4,7 @@ import WalletModal from './WalletModal';
 import AccountModal from './AccountModal';
 import NetworkModal from './NetworkModal';
 import { MetaMaskWallet, OKXWallet, PhantomWallet } from '../core';
+import { MyWalletExtention } from '../core/MyWalletExtention';
 import { Web3Context, useWeb3State } from '../context/Web3Context';
 import { formatEther } from 'viem';
 
@@ -17,6 +18,7 @@ const getChainName = (chainId: number | null) => {
 };
 
 const wallets = [
+    new MyWalletExtention(),
     new MetaMaskWallet(),
     new OKXWallet(),
     new PhantomWallet(),

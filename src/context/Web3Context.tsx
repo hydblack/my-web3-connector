@@ -1,12 +1,16 @@
 import React, { createContext, useContext, useState } from 'react';
 import { AccountInfo, BaseInjectedWallet, MetaMaskWallet, OKXWallet, PhantomWallet } from '../core';
+import { MyWalletExtention } from '../core/MyWalletExtention';
+import { BaseWallet } from '../core/BaseWallet';
+
+export type WalletType = 'MetaMask' | 'OKXWallet' | 'Phantom' | 'MyWallet';
 
 export interface Web3State {
-    wallet: BaseInjectedWallet | null;
+    wallet: BaseWallet | null;
     account: AccountInfo | null;
     connecting: boolean;
     error: Error | null;
-    connect: (walletType: 'MetaMask' | 'OKXWallet' | 'Phantom') => Promise<void>;
+    connect: (walletType: WalletType) => Promise<void>;
     disconnect: () => Promise<void>;
     switchChain: (chainId: number) => Promise<void>;
     isConnected: boolean;
@@ -18,16 +22,16 @@ export const Web3Context = createContext<Web3State | null>(null);
  * 内部状态 hook，供 Web3Provider 和 ConnectButton 内置 Provider 共用
  */
 export const useWeb3State = (): Web3State => {
-    const [wallet, setWallet] = useState<BaseInjectedWallet | null>(null);
+    const [wallet, setWallet] = useState<BaseWallet | null>(null);
     const [account, setAccount] = useState<AccountInfo | null>(null);
     const [connecting, setConnecting] = useState(false);
     const [error, setError] = useState<Error | null>(null);
 
-    const connect = async (walletType: 'MetaMask' | 'OKXWallet' | 'Phantom') => {
+    const connect = async (walletType: WalletType) => {
         setConnecting(true);
         setError(null);
         try {
-            let selectedWallet: BaseInjectedWallet;
+            let selectedWallet: BaseWallet;
             switch (walletType) {
                 case 'MetaMask':
                     selectedWallet = new MetaMaskWallet();
@@ -37,6 +41,9 @@ export const useWeb3State = (): Web3State => {
                     break;
                 case 'Phantom':
                     selectedWallet = new PhantomWallet();
+                    break;
+                case 'MyWallet':
+                    selectedWallet = new MyWalletExtention();
                     break;
                 default:
                     throw new Error(`Unsupported wallet type: ${walletType}`);

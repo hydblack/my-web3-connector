@@ -1,13 +1,15 @@
 import React from 'react';
 import styles from '../styles/Modal.module.css';
 import { useWeb3 } from '../context/Web3Context';
+import type { WalletType } from '../context/Web3Context';
 import metamaskIcon from '../icons/metamask.svg';
 import okxIcon from '../icons/okx.png';
 import phantomIcon from '../icons/phantom.png';
-import { BaseInjectedWallet } from '../core';
+import myWalletIcon from '../icons/mywallet.png';
+import { BaseWallet } from '../core';
 
 interface Props {
-  wallets: BaseInjectedWallet[];
+  wallets: BaseWallet[];
   onClose: () => void;
 }
 
@@ -15,13 +17,14 @@ const walletIconsMap: { [key: string]: string } = {
   'MetaMask': metamaskIcon,
   'OKXWallet': okxIcon,
   'Phantom': phantomIcon,
+  'MyWallet': myWalletIcon,
 };
 
 const WalletModal: React.FC<Props> = ({ wallets, onClose }) => {
   const { connect } = useWeb3();
 
   const handleSelect = async (walletType: string) => {
-    await connect(walletType as 'MetaMask' | 'OKXWallet' | 'Phantom'); 
+    await connect(walletType as WalletType); 
     onClose();
   };
 
