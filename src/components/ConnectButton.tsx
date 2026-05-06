@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import styles from '../styles/ConnectButton.module.css';
 import WalletModal from './WalletModal';
 import AccountModal from './AccountModal';
 import NetworkModal from './NetworkModal';
 import { MetaMaskWallet, OKXWallet, PhantomWallet } from '../core';
-import { useWeb3 } from '../context/Web3Context';
+import { Web3Context, useWeb3State } from '../context/Web3Context';
 import { formatEther } from 'viem';
 
 const getChainName = (chainId: number | null) => {
@@ -22,8 +22,14 @@ const wallets = [
     new PhantomWallet(),
 ];
 
-const ConnectButton: React.FC = () => {
-  const { account, connecting, disconnect, isConnected } = useWeb3();
+/** 
+ * 核心按钮逻辑，始终从最近的 Web3Context 中取状态。
+ * 由 ConnectButton 或外部 Web3Provider 提供 context。
+ */
+const ConnectButtonInner: React.FC = () => {
+  const ctx = useContext(Web3Context)!;
+  const { account, connecting, disconnect, isConnected } = ctx;
+
   const [showWalletModal, setShowWalletModal] = useState(false);
   const [showAccountModal, setShowAccountModal] = useState(false);
   const [showNetworkModal, setShowNetworkModal] = useState(false);
@@ -104,6 +110,47 @@ const ConnectButton: React.FC = () => {
       )}
     </>
   );
+};
+
+/**
+ * 开箱即用的 Web3 连接按钮。
+ *
+ * - **独立使用**：直接放置即可，无需任何 Provider 包裹。
+ *   ```jsx
+ *   <ConnectButton />
+ *   ```
+ *
+ * - **共享状态**：若需在其他组件中访问 Web3 状态（useWallet），
+ *   可在外层包裹 Web3Provider，ConnectButton 会自动使用外部 context。
+ *   ```jsx
+ *   <Web3Provider>
+ *     <ConnectButton />
+ *     <MyOtherComponent />  // 可通过 useWallet() 访问连接状态
+ *   </Web3Provider>
+ *   ```
+ */
+const ConnectButton: React.FC = () => {
+  const externalCtx = useContext(Web3Context);
+
+  // 已有外部 Provider，直接渲染内部按钮即可
+  if (externalCtx) {
+    return <ConnectButtonInner />;
+  }
+
+  // 没有外部 Provider，自带独立 Provider
+  return (
+    <StandaloneProvider>
+      <ConnectButtonInner />
+    </StandaloneProvider>
+  );
+};
+
+/**
+ * 内置的独立 Provider，仅在没有外部 Web3Provider 时使用。
+ */
+const StandaloneProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const state = useWeb3State();
+  return <Web3Context.Provider value={state}>{children}</Web3Context.Provider>;
 };
 
 export default ConnectButton;

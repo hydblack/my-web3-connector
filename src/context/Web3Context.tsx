@@ -1,7 +1,7 @@
-import { createContext, useContext, useState } from 'react';
+import React, { createContext, useContext, useState } from 'react';
 import { AccountInfo, BaseInjectedWallet, MetaMaskWallet, OKXWallet, PhantomWallet } from '../core';
 
-interface Web3State {
+export interface Web3State {
     wallet: BaseInjectedWallet | null;
     account: AccountInfo | null;
     connecting: boolean;
@@ -12,9 +12,12 @@ interface Web3State {
     isConnected: boolean;
 }
 
-const Web3Context = createContext<Web3State | null>(null);
+export const Web3Context = createContext<Web3State | null>(null);
 
-export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+/**
+ * 内部状态 hook，供 Web3Provider 和 ConnectButton 内置 Provider 共用
+ */
+export const useWeb3State = (): Web3State => {
     const [wallet, setWallet] = useState<BaseInjectedWallet | null>(null);
     const [account, setAccount] = useState<AccountInfo | null>(null);
     const [connecting, setConnecting] = useState(false);
@@ -24,7 +27,7 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
         setConnecting(true);
         setError(null);
         try {
-            let selectedWallet;
+            let selectedWallet: BaseInjectedWallet;
             switch (walletType) {
                 case 'MetaMask':
                     selectedWallet = new MetaMaskWallet();
@@ -42,12 +45,10 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
             const accountInfo = await selectedWallet.connect();
             setAccount(accountInfo);
             selectedWallet.on('accountsChanged', ({ accounts, balance }) => {
-                console.log('Accounts changed:', accounts, accountInfo);
                 if (accounts.length === 0) disconnect();
                 else setAccount({ ...accountInfo, address: accounts[0], balance });
             });
             selectedWallet.on('chainChanged', ({ chainId, balance }) => {
-                console.log('Chain changed:', chainId, accountInfo);
                 setAccount((prev) => prev ? { ...prev, chainId, balance } : null);
             });
         } catch (err) {
@@ -58,35 +59,46 @@ export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const disconnect = async () => {
-    if (wallet) {
-      await wallet.disconnect();
-      setWallet(null);
-      setAccount(null);
-    }
-  };
+        if (wallet) {
+            await wallet.disconnect();
+            setWallet(null);
+            setAccount(null);
+        }
+    };
 
-  const switchChain = async (chainId: number) => {
-    if (wallet) {
-      await wallet.switchChain(chainId);
-    }
-  };
+    const switchChain = async (chainId: number) => {
+        if (wallet) {
+            await wallet.switchChain(chainId);
+        }
+    };
 
-  const value = {
-    wallet,
-    account,
-    connecting,
-    error,
-    connect,
-    disconnect,
-    switchChain,
-    isConnected: !!account,
-  };
-
-  return <Web3Context.Provider value={value}>{children}</Web3Context.Provider>;
+    return {
+        wallet,
+        account,
+        connecting,
+        error,
+        connect,
+        disconnect,
+        switchChain,
+        isConnected: !!account,
+    };
 };
 
-export const useWeb3 = () => {
+/**
+ * 可选的外部 Provider，供需要在多个子组件间共享 Web3 状态时使用。
+ * 直接使用 <ConnectButton /> 时无需此 Provider。
+ */
+export const Web3Provider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const state = useWeb3State();
+    return <Web3Context.Provider value={state}>{children}</Web3Context.Provider>;
+};
+
+/**
+ * 在 Web3Provider 内部使用，获取共享的 Web3 状态。
+ * ConnectButton 内部不依赖此 hook（已内置状态）。
+ */
+export const useWeb3 = (): Web3State => {
     const ctx = useContext(Web3Context);
     if (!ctx) throw new Error('useWeb3 must be used within Web3Provider');
     return ctx;
-}
+};
