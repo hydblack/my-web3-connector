@@ -49,7 +49,7 @@ export class MyWalletExtention extends BaseWallet {
         const w = window as any;
         // 优先用 isMyWallet 标记的 provider，避免被 MetaMask 覆盖的情况
         if (w.ethereum?.isMyWallet) return w.ethereum;
-        if (w.mywallet) return w.mywallet;
+        if (w.myWallet) return w.myWallet;
         if (w.ethereum) return w.ethereum;
         return null;
     }
